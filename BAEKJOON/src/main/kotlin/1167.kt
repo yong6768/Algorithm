@@ -1,8 +1,3 @@
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.lang.Integer.max
-import java.util.*
-
 //문제
 //트리의 지름이란, 트리에서 임의의 두 점 사이의 거리 중 가장 긴 것을 말한다. 트리의 지름을 구하는 프로그램을 작성하시오.
 //
@@ -23,6 +18,12 @@ import java.util.*
 //예제 출력 1
 //11
 
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.lang.Integer.max
+import java.util.*
+
+
 lateinit var nodes: Array<Node>
 var max = 0
 
@@ -32,12 +33,12 @@ fun main() {
     nodes = Array<Node>(V+1){Node(it)}
 
     for(i in 0 until V) {
-        var input = reader.readLine()!!.split(" ")
-        var from = input[0].toInt()
+        var input = reader.readLine()!!.split(" ").map { it.toInt() }
+        var from = input[0]
 
         for(j in 1 until input.size-1 step (2)) {
-            var to = input[j].toInt()
-            var weight = input[j+1].toInt()
+            var to = input[j]
+            var weight = input[j+1]
 
             var edge = Edge(from, to, weight)
             nodes[from].edges.add(edge)
@@ -49,14 +50,15 @@ fun main() {
 }
 
 class Node(
-    val nodeNum: Int
+    private val nodeNum: Int
 ) {
     var edges = mutableListOf<Edge>()
 
-    // 자식의 최대 길이 2개 반환
-    // 자식이 없거나 하나인 경우 0 반환
-    fun getMaxChildLength(): Pair<Int, Int> {
+    // 자식의 최대 길이 반환
+    // 자식이 없는 경우 0 반환
+    fun getMaxChildLength(): Int {
         var childLen = PriorityQueue<Int>(Collections.reverseOrder())
+        // 자식이 없거나 하나인 경우 null이 아니라 0 반환을 위해
         childLen.add(0)
         childLen.add(0)
 
@@ -68,14 +70,14 @@ class Node(
                         && childNodeEdge.to == this.nodeNum)
             }
 
-            var (childFirst, _) = child.getMaxChildLength()
-            childLen.add(childFirst + edge.weight)
+            var childMax = child.getMaxChildLength()
+            childLen.add(childMax + edge.weight)
         }
 
         var first = childLen.poll()
         var second = childLen.poll()
         max = max(max, first+second)
-        return Pair(first, second)
+        return first
     }
 }
 
